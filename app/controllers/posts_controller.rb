@@ -20,7 +20,7 @@ class PostsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
-    @posts = @group.posts.order("created_at DESC")
+    @posts = @group.posts.order.recent
   end
 
   private
