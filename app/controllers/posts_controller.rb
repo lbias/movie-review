@@ -20,7 +20,7 @@ class PostsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
-    @posts = @group.posts.order.recent
+    @posts = @group.posts.order.recent.paginate(:page => params[:page], :per_page => 10)
   end
 
   private
