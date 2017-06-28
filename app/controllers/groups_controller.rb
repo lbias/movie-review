@@ -22,6 +22,7 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
+    @posts = @group.posts.recent.paginate(:page => params[:page], :per_page => 10)
   end
 
   def edit
