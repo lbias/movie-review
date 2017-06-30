@@ -1,5 +1,5 @@
 class GroupsController < ApplicationController
-  before_action :authenticate_user! , only: [:new, :create, :edit, :update, :destroy]
+  before_action :authenticate_user! , only: [:new, :create, :edit, :update, :destroy, :join, :quit]
   before_action :find_group_and_check_permission, only: [:edit, :update, :destroy]
 
   def index
@@ -14,6 +14,7 @@ class GroupsController < ApplicationController
     @group = Group.new(group_params)
     @group.user = current_user
     if @group.save
+      current_user.join!(@group)
       redirect_to groups_path
     else
       render :new
@@ -39,6 +40,30 @@ class GroupsController < ApplicationController
   def destroy
     @group.destroy
     redirect_to groups_path, alert: "Group deleted"
+  end
+
+  def join
+    @group = Group.find(params[:id])
+    if !current_user.is_member_of?(@group)
+      current_user.join!(@group)
+      flash[:notice] = "You just joined this movie review group!"
+    else
+      flash[:warning] = "You are in the group. It's unneceessary to join again!"
+    end
+
+    redirect_to group_path(@group)
+  end
+
+  def quit
+    @group = Group.find(params[:id])
+    if current_user.is_member_of?(@group)
+      current_user.quit!(@group)
+      flash[:alert] = "You just quitted the group."
+    else
+      flash[:warning] = "You are not a group member."
+    end
+
+    redirect_to group_path(@group)
   end
 
   private
